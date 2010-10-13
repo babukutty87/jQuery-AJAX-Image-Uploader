@@ -1,0 +1,71 @@
+ <!DOCTYPE html> 
+<html> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+<title>Ajax upload demo</title> 
+<script type="text/javascript" src="jquery-1.4.1.min.js"></script> 
+<script type="text/javascript" src="ajax-upload.js"></script> 
+<script type="text/javascript"> 
+	
+$(document).ready(function(){
+ 
+var id = 1;
+ 
+$('.thumb').each(
+   function() { 
+     $(this).attr('id', 'thumb' + id); 
+	id++;
+ 
+	new AjaxUpload($(this).attr('id'), {
+		action: 'upload.php?fieldname=image'+$(this).attr('id'),
+		name: 'image'+$(this).attr('id'), // name: 'image'+$(this).attr('id'),
+		onSubmit: function(file, extension) {
+		
+			var targetid = this._settings.name.replace("imagethumb", "");
+		
+			if (!(extension && /^(jpg|png|jpeg|gif)$/i.test(extension))){
+                        // extension is not allowed
+                        alert('Error: invalid file extension');
+                        // cancel upload
+                        return false;
+                }
+			else {
+				
+				$('img#thumb'+targetid).closest('div.preview').addClass('loading');
+			}
+		},
+		onComplete: function(file, response) {
+ 
+			var targetid = this._settings.name.replace("imagethumb", "");
+			
+			$('img#thumb'+targetid).load(function(){
+				$('img#thumb'+targetid).closest('div.preview').removeClass('loading');
+				$('img#thumb'+targetid).unbind();
+			});
+			$('img#thumb'+targetid).attr('src', response);
+			$('input#imagefield'+targetid).remove();
+			$('img#thumb'+targetid).after('<input class="thumbfield" type="hidden" name="imagefield'+targetid+'" id="imagefield'+targetid+'" value="'+response+'" />');
+ 
+		}
+	});
+});	
+ 
+});
+ 
+ 
+ 
+</script> 
+ 
+<style media="all" type="text/css"> 
+	div.preview { float: left; width: 100px; height: 100px; border: 2px dotted #CCCCCC; }
+	div.preview.loading { background: url(loading.gif) no-repeat 39px 40px; }
+	div.preview.loading img {display: none; }
+</style> 
+</head> 
+<body> 
+<div class="preview"><img class="thumb" width="100" height="100" src="demo.gif" /></div> 
+<div class="preview"><img class="thumb" width="100" height="100" src="demo.gif" /></div> 
+ 
+</body> 
+</html> 
+
